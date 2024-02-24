@@ -1,0 +1,32 @@
+ManifestFileVersion: 0
+CRC: 3038987814
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 9e1b36ba3848d0e85d4b106a67962a6f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 093869ad3333375dc7c60b78be40c04d
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 9e1b36ba3848d0e85d4b106a67962a6f
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/msVFX_Free Smoke Effects Pack/Prefabs/msVFX_Stylized Smoke 1.prefab
+Dependencies: []
