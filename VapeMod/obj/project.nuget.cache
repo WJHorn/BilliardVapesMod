@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CDEnvqPstYLkbkpNCkzdE2r/y/A4HPPnN44zWCfDyaQgDLb1dOtOYr1hLXB2hGa9Ve4hFgoCQMkUzsJ7SVZIcQ==",
+  "dgSpecHash": "DW3Qf9Kn0MOUa8TRLjYd2ESW/g/sfuWWjcorGGN3xIHWxb5cKYZAZhTkHVp0xbs6WCAZoVnoVEHzBo0bcNHVUQ==",
   "success": true,
-  "projectFilePath": "E:\\Modding\\LethalCompany\\LethalCompanyTemplate\\VapeMod\\VapeMod.csproj",
+  "projectFilePath": "E:\\Modding\\LethalCompany\\BilliardVapes\\VapeMod\\VapeMod.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\fasis\\.nuget\\packages\\unityengine.modules\\2022.3.9\\unityengine.modules.2022.3.9.nupkg.sha512"
   ],

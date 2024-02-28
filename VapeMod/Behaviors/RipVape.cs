@@ -5,18 +5,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace VapeMod.Behaviors
 {
     internal class RipVape : PhysicsProp
     {
+        public ParticleSystem ps;
         public AudioSource audioSource;
         public AudioClip[] ripClips;
         public AssetBundle smokePrefab;
         ManualLogSource Logger;
-        Boolean isLoaded = false;
+        public Boolean isLoaded = false;
+        public GameObject smoke;
 
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
@@ -44,25 +48,44 @@ namespace VapeMod.Behaviors
 
             if (base.IsOwner)
             {
-                playerHeldBy.activatingItem = buttonDown;
-                playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", buttonDown);
-                this.itemProperties.rotationOffset.y = 45;
-                this.itemProperties.positionOffset.z = (float)(0.1);
-                
-                GameObject smoke = smokePrefab.LoadAsset<GameObject>("Assets/msVFX_Free Smoke Effects Pack/Prefabs/msVFX_Stylized Smoke 1.prefab");
-                NetworkPrefabs.RegisterNetworkPrefab(smoke);
-                Utilities.FixMixerGroups(smoke);
-                Instantiate(smoke, parentObject.position, Quaternion.identity);
-                ParticleSystem ps = smoke.GetComponent<ParticleSystem>();
-                //Logger.LogError(ps);
-                ps.Play();
+            playerHeldBy.activatingItem = buttonDown;
+            playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", buttonDown);
+            this.itemProperties.rotationOffset.y = 45;
+            this.itemProperties.positionOffset.z = (float)(0.1);
 
-                //GameObject.Destroy(smoke);
-                //UnityEngine.Object.Instantiate(smoke, playerHeldBy.currentlyHeldObject.propBody.position, Quaternion.identity, playerHeldBy.currentlyHeldObject.propBody.transform);
-            }
-            StartCoroutine(undoAnimation());
+            smoke = smokePrefab.LoadAsset<GameObject>("Assets/msVFX_Free Smoke Effects Pack/Prefabs/msVFX_Stylized Smoke 1.prefab");
+            LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(smoke);
+            Utilities.FixMixerGroups(smoke);
+            
 
             
+            RipVapeServerRpc();
+
+            }
+
+            StartCoroutine(undoAnimation());
+        }
+
+        [ServerRpc]
+        private void RipVapeServerRpc()
+        {
+            RipVapeClientRpc();
+        }
+
+        [ClientRpc]
+        private void RipVapeClientRpc()
+        {
+
+            //ps.useAutoRandomSeed = false;
+            //Logger.LogError(ps
+            //Instantiate(smoke, parentObject.position, Quaternion.identity);
+
+            Instantiate(smoke, parentObject.position, Quaternion.identity);
+            ps = smoke.GetComponent<ParticleSystem>();
+            ps.Play();
+
+            //GameObject.Destroy(smoke);
+            //UnityEngine.Object.Instantiate(smoke, playerHeldBy.currentlyHeldObject.propBody.position, Quaternion.identity, playerHeldBy.currentlyHeldObject.propBody.transform);
         }
 
         public IEnumerator undoAnimation()
