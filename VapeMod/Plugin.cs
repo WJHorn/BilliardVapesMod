@@ -70,6 +70,7 @@ namespace VapeMod
             node.clearPreviousText = true;
             node.displayText = "A giant blueberry flavored vape";
             Items.RegisterShopItem(Vape, null, null, node, 0);
+            AssetBundle.UnloadAllAssetBundles(false);
 
             Logger.LogInfo("Vape mod loaded");
 

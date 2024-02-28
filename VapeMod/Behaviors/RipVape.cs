@@ -24,14 +24,11 @@ namespace VapeMod.Behaviors
 
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
-            if (!isLoaded)
-            {
-                base.ItemActivate(used, buttonDown);
+            base.ItemActivate(used, buttonDown);
 
-                string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                smokePrefab = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "smoke"));
-                isLoaded = true;
-            }
+            string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            smokePrefab = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "smoke"));
+            isLoaded = true;
 
             if (smokePrefab == null)
             {
@@ -64,6 +61,7 @@ namespace VapeMod.Behaviors
             }
 
             StartCoroutine(undoAnimation());
+            AssetBundle.UnloadAllAssetBundles(false);
         }
 
         [ServerRpc]
@@ -90,7 +88,7 @@ namespace VapeMod.Behaviors
 
         public IEnumerator undoAnimation()
         {
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(1);
             if (base.IsOwner)
             {
                 // damage player 
