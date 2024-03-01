@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using GameNetcodeStuff;
 using LethalLib.Modules;
 using System;
 using System.Collections;
@@ -21,6 +22,8 @@ namespace VapeMod.Behaviors
         ManualLogSource Logger;
         public Boolean isLoaded = false;
         public GameObject smoke;
+        public PlayerControllerB previousPlayerHeldBy;
+        public Boolean isRipping = false;
 
         public override void OnNetworkSpawn()
         {
@@ -30,6 +33,7 @@ namespace VapeMod.Behaviors
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
+            previousPlayerHeldBy = playerHeldBy;
 
             string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             smokePrefab = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "smoke"));
@@ -43,10 +47,8 @@ namespace VapeMod.Behaviors
 
             if (base.IsOwner)
             {
-                playerHeldBy.activatingItem = true;
-                playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", true);
-                this.itemProperties.rotationOffset.y = 45;
-                this.itemProperties.positionOffset.z = (float)(0.2);
+                isRipping = true;
+                StartCoroutine(doAnimation());
 
                 if (this.insertedBattery.charge > 0)
                 {
@@ -68,11 +70,42 @@ namespace VapeMod.Behaviors
                     // damage player 
                     //playerHeldBy.DamagePlayer(50, causeOfDeath: CauseOfDeath.Unknown, deathAnimation: 1);
                 }
-
+                
                 StartCoroutine(undoAnimation());
+                
+                
             }
 
             AssetBundle.UnloadAllAssetBundles(false);
+        }
+
+        public override void DiscardItem()
+        {
+            if (!isRipping)
+            {
+                base.DiscardItem();
+            }
+            else
+            {
+                previousPlayerHeldBy.playerBodyAnimator.SetBool("useTZPItem", false);
+                previousPlayerHeldBy.activatingItem = false;
+                this.itemProperties.rotationOffset.y = 0;
+                this.itemProperties.positionOffset.z = 0;
+            }
+        }
+        public override void OnPlaceObject()
+        {
+            if (!isRipping)
+            {
+                base.OnPlaceObject();
+            }
+            else
+            {
+                previousPlayerHeldBy.playerBodyAnimator.SetBool("useTZPItem", false);
+                previousPlayerHeldBy.activatingItem = false;
+                this.itemProperties.rotationOffset.y = 0;
+                this.itemProperties.positionOffset.z = 0;
+            }
         }
 
         [ServerRpc]
@@ -89,16 +122,32 @@ namespace VapeMod.Behaviors
             ps.Play();
         }
 
+        public IEnumerator doAnimation()
+        {
+            if (base.IsOwner)
+            {
+                yield return new WaitForSeconds(0);
+                playerHeldBy.activatingItem = true;
+                playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", true);
+                this.itemProperties.rotationOffset.y = 45;
+                this.itemProperties.positionOffset.z = (float)(0.2);
+            }
+        }
+
         public IEnumerator undoAnimation()
         {
             yield return new WaitForSeconds(1);
             if (base.IsOwner)
             {
-                //undo the animation
-                playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", false);
-                playerHeldBy.activatingItem = false;
-                this.itemProperties.rotationOffset.y = 0;
-                this.itemProperties.positionOffset.z = 0;
+                if (playerHeldBy != null)
+                {
+                    //undo the animation
+                    playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", false);
+                    playerHeldBy.activatingItem = false;
+                    this.itemProperties.rotationOffset.y = 0;
+                    this.itemProperties.positionOffset.z = 0;
+                    isRipping = false;
+                }
             }
         }
     }
