@@ -22,6 +22,11 @@ namespace VapeMod.Behaviors
         public Boolean isLoaded = false;
         public GameObject smoke;
 
+        public override void OnNetworkSpawn()
+        {
+            this.insertedBattery.charge = 1;
+            base.OnNetworkSpawn();
+        }
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
@@ -32,35 +37,41 @@ namespace VapeMod.Behaviors
 
             if (smokePrefab == null)
             {
-                Logger.LogError("Failed to load custom assets."); // ManualLogSource for your plugin
+                Logger.LogError("Failed to load custom assets.");
                 return;
             }
 
-            //int num = UnityEngine.Random.Range(0, ripClips.Length);
-            //audioSource.PlayOneShot(ripClips[num]);
-
-
-            //WalkieTalkie.TransmitOneShotAudio(audioSource, ripClips[num], 1f);
-            //RoundManager.Instance.PlayAudibleNoise(base.transform.position, 20, 1f, 0, isInElevator && StartOfRound.Instance.hangarDoorsClosed);
-
             if (base.IsOwner)
             {
-            playerHeldBy.activatingItem = buttonDown;
-            playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", buttonDown);
-            this.itemProperties.rotationOffset.y = 45;
-            this.itemProperties.positionOffset.z = (float)(0.1);
+                playerHeldBy.activatingItem = true;
+                playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", true);
+                this.itemProperties.rotationOffset.y = 45;
+                this.itemProperties.positionOffset.z = (float)(0.2);
 
-            smoke = smokePrefab.LoadAsset<GameObject>("Assets/msVFX_Free Smoke Effects Pack/Prefabs/msVFX_Stylized Smoke 1.prefab");
-            LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(smoke);
-            Utilities.FixMixerGroups(smoke);
-            
+                if (this.insertedBattery.charge > 0)
+                {
+                    this.insertedBattery.charge -= 0.1f;
 
-            
-            RipVapeServerRpc();
+                    smoke = smokePrefab.LoadAsset<GameObject>("Assets/msVFX_Free Smoke Effects Pack/Prefabs/msVFX_Stylized Smoke 1.prefab");
+                    LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(smoke);
+                    Utilities.FixMixerGroups(smoke);
 
+                    //example code for playing audio
+                    //int num = UnityEngine.Random.Range(0, ripClips.Length);
+                    //audioSource.PlayOneShot(ripClips[num]);
+
+                    //WalkieTalkie.TransmitOneShotAudio(audioSource, ripClips[num], 1f);
+                    //RoundManager.Instance.PlayAudibleNoise(base.transform.position, 20, 1f, 0, isInElevator && StartOfRound.Instance.hangarDoorsClosed);
+
+                    RipVapeServerRpc();
+
+                    // damage player 
+                    //playerHeldBy.DamagePlayer(50, causeOfDeath: CauseOfDeath.Unknown, deathAnimation: 1);
+                }
+
+                StartCoroutine(undoAnimation());
             }
 
-            StartCoroutine(undoAnimation());
             AssetBundle.UnloadAllAssetBundles(false);
         }
 
@@ -73,17 +84,9 @@ namespace VapeMod.Behaviors
         [ClientRpc]
         private void RipVapeClientRpc()
         {
-
-            //ps.useAutoRandomSeed = false;
-            //Logger.LogError(ps
-            //Instantiate(smoke, parentObject.position, Quaternion.identity);
-
             Instantiate(smoke, parentObject.position, Quaternion.identity);
             ps = smoke.GetComponent<ParticleSystem>();
             ps.Play();
-
-            //GameObject.Destroy(smoke);
-            //UnityEngine.Object.Instantiate(smoke, playerHeldBy.currentlyHeldObject.propBody.position, Quaternion.identity, playerHeldBy.currentlyHeldObject.propBody.transform);
         }
 
         public IEnumerator undoAnimation()
@@ -91,15 +94,11 @@ namespace VapeMod.Behaviors
             yield return new WaitForSeconds(1);
             if (base.IsOwner)
             {
-                // damage player 
-                //playerHeldBy.DamagePlayer(50, causeOfDeath: CauseOfDeath.Unknown, deathAnimation: 1);
-
+                //undo the animation
                 playerHeldBy.playerBodyAnimator.SetBool("useTZPItem", false);
                 playerHeldBy.activatingItem = false;
                 this.itemProperties.rotationOffset.y = 0;
                 this.itemProperties.positionOffset.z = 0;
-                //smokePrefab.Unload(smokePrefab);
-                
             }
         }
     }

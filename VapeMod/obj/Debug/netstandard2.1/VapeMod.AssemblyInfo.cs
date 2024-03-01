@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("A mod to let you rip vapes in Lethal Company")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aff1fb2ac205b3efdd77ce0e792a67d8f907c807")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ede9c762a8b6f87ea78f9deeb209fee3a68505c3")]
 [assembly: System.Reflection.AssemblyProductAttribute("BilliardHorn.VapeMod")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BilliardHorn.VapeMod")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
